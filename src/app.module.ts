@@ -3,6 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AuthModule } from './auth/auth.module'
 import { GameModule } from './game/game.module'
+import { QuestionModule } from './question/question.module'
+import { User } from './auth/user.entity'
+import { Game } from './game/game.entity'
+import { Question } from './question/questions.entity'
 
 @Module({
   imports: [
@@ -10,19 +14,16 @@ import { GameModule } from './game/game.module'
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DATABASE_HOST'),
-        port: configService.get<number>('DATABASE_PORT'),
-        username: configService.get<string>('DATABASE_USERNAME'),
-        password: configService.get<string>('DATABASE_PASSWORD'),
-        database: configService.get<string>('DATABASE_NAME'),
-        autoLoadEntities: true,
-        synchronize: true,
+        type: 'mongodb',
+        url: configService.get<string>('MONGODB_URI'),
+        entities: [User, Game, Question],
+        useUnifiedTopology: true,
       }),
       inject: [ConfigService],
     }),
     AuthModule,
     GameModule,
+    QuestionModule,
   ],
 })
 export class AppModule {}
