@@ -1,24 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm'
+import * as bcrypt from 'bcrypt'
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number; // This should be the primary key.
+  id: number
 
   @Column({ unique: true })
-  username: string;
+  username: string
 
   @Column()
-  password: string;
+  password: string
 
   @BeforeInsert()
   async hashPassword() {
-    this.password = await bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 10)
   }
 
   constructor(username: string, password: string) {
-    this.username = username;
-    this.password = password;
+    this.username = username
+    this.password = password
   }
 }
