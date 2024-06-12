@@ -11,15 +11,17 @@ import { GameService } from './game.service'
 
 @WebSocketGateway()
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() server: Server
+
+  @WebSocketServer() 
+  server: Server
 
   constructor(private gameService: GameService) {}
 
-  afterInit(server: Server) {
+  afterInit() {
     console.log('WebSocket server initialized')
   }
 
-  handleConnection(client: Socket, ...args: any[]) {
+  handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`)
   }
 
@@ -27,7 +29,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     console.log(`Client disconnected: ${client.id}`)
   }
 
-  @SubscribeMessage('joinGame')
+  @SubscribeMessage('game:init')
   async handleJoinGame(client: Socket, data: { username: string }) {
     const game = await this.gameService.joinGame(data.username)
     client.join(game.id.toString())
@@ -36,18 +38,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  @SubscribeMessage('nextQuestion')
+  @SubscribeMessage('question:send')
   async handleNextQuestion(client: Socket, data: { gameId: number }) {
     const questions = await this.gameService.getQuestions()
     this.server.to(data.gameId.toString()).emit('question', questions)
   }
 
-  @SubscribeMessage('submitAnswer')
+  @SubscribeMessage('answer:submit')
   async handleSubmitAnswer(client: Socket, data: { gameId: number, username: string, questionId: number, answer: string }) {
     await this.gameService.submitAnswer(data.gameId, data.username, data.questionId, data.answer)
     // Notify both players if both have answered
-    // This is a simplified example and should be expanded with more robust logic
     const game = await this.gameService.calculateScores(data.gameId)
-    this.server.to(data.gameId.toString()).emit('gameOver', game)
+    this.server.to(data.gameId.toString()).emit('game:end', game)
   }
 }

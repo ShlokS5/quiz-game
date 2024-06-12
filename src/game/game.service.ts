@@ -17,7 +17,7 @@ export class GameService {
   }
 
   async joinGame(username: string): Promise<Game> {
-    let game = await this.gameRepository.findOne({ where: { status: 'waiting' }, relations: ['player1', 'player2'] })
+    let game = await this.gameRepository.findOne({ where: { status: 'waiting' } })
     if (!game) {
       game = await this.createGame(username)
     } else {
