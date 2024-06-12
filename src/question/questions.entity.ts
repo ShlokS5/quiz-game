@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
+import { Game } from 'src/game/game.entity'
 
 @Entity()
 export class Question {
@@ -6,11 +7,20 @@ export class Question {
   id: number
 
   @Column()
-  text: string
+  questionText: string
 
-  @Column('simple-array')
+  @Column()
   choices: string[]
 
   @Column()
   correctAnswer: string
+
+  @ManyToOne(() => Game, game => game.questions)
+  game: Game
+
+  @Column({ nullable: true })
+  player1Answer: string
+
+  @Column({ nullable: true })
+  player2Answer: string
 }

@@ -1,5 +1,6 @@
-// src/game/game.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { User } from 'src/auth/user.entity'
+import { Question } from 'src/question/questions.entity'
+import { Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity()
 export class Game {
@@ -12,15 +13,21 @@ export class Game {
   @Column()
   player2: string
 
-  @Column('jsonb')
-  questions: any[]
+  @Column()
+  questions: Question[]
 
   @Column({ default: 0 })
-  score1: number
+  player1Score: number
 
   @Column({ default: 0 })
-  score2: number
+  player2Score: number
 
-  @Column({ default: false })
-  finished: boolean
+  @Column({ default: 'waiting' })
+  status: 'waiting' | 'in_progress' | 'completed'
+
+  @CreateDateColumn()
+  createdAt: Date
+
+  @UpdateDateColumn()
+  updatedAt: Date
 }
